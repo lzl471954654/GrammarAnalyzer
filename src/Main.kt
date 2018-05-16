@@ -20,6 +20,62 @@ fun main(args: Array<String>) {
     }
 }
 
+fun getForecastAnalysisTable(){
+    println("开始计算预测分析表")
+    val endChar = getEndCharFromRawDataList()
+    val itemCount = rawDataList.size
+    val width = endChar.size
+    val table : Array<Array<RawData?>> = initTable(itemCount = itemCount,width = width)
+
+    var index = 1
+    while ( index < itemCount+1){
+        table[index][0] = RawData(rawDataList[index-1].first, null)
+        index++
+    }
+    index = 1
+    while ( index < width+1){
+        table[0][index] = RawData(endChar[index-1], null)
+        index++
+    }
+    val indexMap = HashMap<Char,Int>()
+    endChar.forEachIndexed { ind, c -> indexMap[c] = ind }
+    index = 1
+    while ( index < itemCount+1){
+        val targetChar = table[index][0]!!.element
+        val rawData = rawDataMap[targetChar]!!
+        var hasEpsilon = false
+        val firstSet = firstMap[targetChar]
+        firstSet!!.forEach {
+            val firstIndex = indexMap[it]!!
+
+        }
+    }
+}
+
+
+
+private fun initTable(itemCount : Int, width : Int):Array<Array<RawData?>>{
+    val table : Array<Array<RawData?>> = Array<Array<RawData?>>(itemCount+1){
+        Array(width+1){
+            null
+        }
+    }
+    return table
+}
+
+fun getEndCharFromRawDataList():ArrayList<Char>{
+    val endChar = ArrayList<Char>()
+    rawDataList.forEach {
+        it.second.datas!!.forEach {
+            it.forEach {
+                if (endSet.contains(it))
+                    endChar.add(it)
+            }
+        }
+    }
+    return endChar
+}
+
 fun getFirstSet(){
     println("开始计算First集")
     rawDataList = rawDataMap.toList()
@@ -43,7 +99,7 @@ fun calculateFollowSet(char: Char){
             HashSet()
     for (x in rawDataList){
         val rawData = x.second
-        rawData.datas.forEach {
+        rawData.datas!!.forEach {
             var index = 0
             val length = it.length
             while (index < length){
@@ -98,7 +154,7 @@ fun calculateFirstSet(char: Char){
     val set = HashSet<Char>()
     val rawData = rawDataMap[char]!!
     var containEpsilon = true
-    rawData.datas.forEach {
+    rawData.datas!!.forEach {
         if (endSet.contains(it[0]))
             set.add(it[0])
         else{
@@ -141,7 +197,7 @@ fun readRawData(){
             val rawData = RawData(element,datas = datas.split("|").toMutableList())
             rawDataMap[element] = rawData
         }else{
-            rawDataMap[element]!!.datas.add(datas)
+            rawDataMap[element]!!.datas!!.add(datas)
         }
         count++
     }
